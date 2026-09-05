@@ -8,12 +8,18 @@
  * in a cache would only mask new issues.
  */
 
-const VERSION = "v6";
+const VERSION = "v7";
 const SHELL = `yomu-shell-${VERSION}`;
 const ASSETS = `yomu-assets-${VERSION}`;
 const KEEP = new Set([SHELL, ASSETS]);
 
-const SHELL_URLS = ["/", "/issues/", "/issue/", "/read/", "/search/", "/icons/icon-192.png"];
+// The worker is served from the base path, so its own location gives the
+// prefix — Pages puts a project site under /<repo>/.
+const BASE = new URL("./", self.location).pathname.replace(/\/$/, "");
+
+const SHELL_URLS = ["/", "/issues/", "/issue/", "/read/", "/search/", "/icons/icon-192.png"].map(
+  (p) => `${BASE}${p}`
+);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -46,7 +52,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   // Always go to the network for library data; sync handles being offline.
-  if (url.pathname.startsWith("/bundle/")) return;
+  if (url.pathname.startsWith(`${BASE}/bundle/`)) return;
 
   if (request.mode === "navigate") {
     event.respondWith(
@@ -58,13 +64,13 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(async () => {
           const cached = await caches.match(pageKey(request.url));
-          return cached || (await caches.match("/")) || Response.error();
+          return cached || (await caches.match(`${BASE}/`)) || Response.error();
         })
     );
     return;
   }
 
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
+  if (url.pathname.startsWith(`${BASE}/_next/static/`) || url.pathname.startsWith(`${BASE}/icons/`)) {
     event.respondWith(
       caches.match(request).then(
         (hit) =>
