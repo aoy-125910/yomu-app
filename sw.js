@@ -8,7 +8,7 @@
  * in a cache would only mask new issues.
  */
 
-const VERSION = "v7";
+const VERSION = "v8";
 const SHELL = `yomu-shell-${VERSION}`;
 const ASSETS = `yomu-assets-${VERSION}`;
 const KEEP = new Set([SHELL, ASSETS]);
@@ -17,7 +17,7 @@ const KEEP = new Set([SHELL, ASSETS]);
 // prefix — Pages puts a project site under /<repo>/.
 const BASE = new URL("./", self.location).pathname.replace(/\/$/, "");
 
-const SHELL_URLS = ["/", "/issues/", "/issue/", "/read/", "/search/", "/icons/icon-192.png"].map(
+const SHELL_URLS = ["/", "/issues/", "/issue/", "/read/", "/search/", "/setup/", "/icons/icon-192.png"].map(
   (p) => `${BASE}${p}`
 );
 
